@@ -1,11 +1,13 @@
 package net.virtualviking.vra8jenkins
 
-import wslite.rest.ContentType
-import wslite.rest.RESTClient
+import groovy.json.JsonSlurper
 
+import java.nio.charset.Charset
 import java.util.concurrent.TimeoutException
 
-class VRAClient {
+import groovy.json.JsonOutput
+
+class VRAClient implements Serializable {
     private static final int timeout = 30000
 
     private static final int deploymentPollInterval = 30000
@@ -87,44 +89,72 @@ class VRAClient {
     def deleteDeployment(String deploymentId, long timeout = 60000) {
         def dep = deleteDeploymentNoWait(deploymentId)
         assert dep != null
-        return waitForDeployment(dep.id)
+        return waitForDeployment(deploymentId)
     }
 
     private post(String url, Map payload, Map query = null) {
-        RESTClient client = new RESTClient(url)
-        def response = client.post(query: query, headers : token != null ? [ "Authorization": "Bearer " + token] : null) {
-            type ContentType.JSON
-            json payload
+        if(query != null) {
+           url += buildQueryString(query)
         }
-        assert response.statusCode == 200
-        return response.json
+        def u = new URL(url)
+        def conn = u.openConnection()
+        conn.setRequestMethod("POST")
+        conn.setRequestProperty("Authorization", "Bearer "+ token)
+        conn.setRequestProperty("Accept", "application/json")
+        conn.setRequestProperty("Content-Type", "application/json")
+        conn.setDoOutput(true)
+        def writer = new OutputStreamWriter(conn.outputStream);
+        writer.write(JsonOutput.toJson(payload));
+        writer.flush();
+        writer.close();
+        conn.connect()
+
+        assert conn.responseCode == 200
+        return new JsonSlurper().parse(conn.content)
     }
 
     private get(String url, Map query = null) {
-        RESTClient client = new RESTClient(url)
-        def response = client.get(
-                accept: ContentType.JSON,
-                headers: [ "Authorization": "Bearer " + token],
-                query: query
-        )
-        assert response.statusCode == 200
-        return response.json
+        if(query != null) {
+            url += buildQueryString(query)
+        }
+        def u = new URL(url)
+        def conn = u.openConnection()
+        conn.setRequestMethod("GET")
+        conn.setRequestProperty("Authorization", "Bearer "+ token)
+        conn.setRequestProperty("Accept", "application/json")
+        conn.connect()
+        assert conn.responseCode == 200
+        return new JsonSlurper().parse(conn.content)
     }
 
     private delete(String url, Map query = null) {
-        RESTClient client = new RESTClient(url)
-        def response = client.delete(
-                accept: ContentType.JSON,
-                headers: [ "Authorization": "Bearer " + token],
-                query: query
-        )
-        assert response.statusCode == 200
-        return response.json
+        if(query != null) {
+            url += buildQueryString(query)
+        }
+        def u = new URL(url)
+        def conn = u.openConnection()
+        conn.setRequestMethod("DELETE")
+        conn.setRequestProperty("Authorization", "Bearer "+ token)
+        conn.setRequestProperty("Accept", "application/json")
+        conn.connect()
+        assert conn.responseCode == 200
+        return new JsonSlurper().parse(conn.content)
     }
 
     private checkRespoonseSingleton(response) {
         assert response != null
         assert response.content != null
         assert response.content.size() == 1
+    }
+
+    private buildQueryString(Map q) {
+        def s = "?"
+        q.eachWithIndex { k, v, i ->
+            if(i > 0) {
+                s += "&"
+            }
+            s += k + "=" + URLEncoder.encode(v, Charset.defaultCharset())
+        }
+        return s
     }
 }

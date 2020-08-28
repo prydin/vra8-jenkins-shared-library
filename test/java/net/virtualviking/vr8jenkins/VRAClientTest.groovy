@@ -2,7 +2,6 @@ package net.virtualviking.vr8jenkins
 
 import net.virtualviking.vra8jenkins.VRAClient
 import spock.lang.Specification
-import wslite.rest.RESTClientException
 
 class VRAClientTest extends Specification {
     private VRAClient cachedClient
