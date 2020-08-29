@@ -115,6 +115,7 @@ class VRAClient implements Serializable {
         return new JsonSlurper().parse(conn.content)
     }
 
+    @NonCPS
     private get(String url, Map query = null) {
         if(query != null) {
             url += buildQueryString(query)
@@ -129,6 +130,7 @@ class VRAClient implements Serializable {
         return new JsonSlurper().parse(conn.content)
     }
 
+    @NonCPS
     private delete(String url, Map query = null) {
         if(query != null) {
             url += buildQueryString(query)
@@ -143,12 +145,14 @@ class VRAClient implements Serializable {
         return new JsonSlurper().parse(conn.content)
     }
 
+    @NonCPS
     private checkRespoonseSingleton(response) {
         assert response != null
         assert response.content != null
         assert response.content.size() == 1
     }
 
+    @NonCPS
     private buildQueryString(Map q) {
         def s = "?"
         q.eachWithIndex { k, v, i ->
