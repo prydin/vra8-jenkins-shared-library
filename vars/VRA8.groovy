@@ -3,7 +3,7 @@ import net.virtualviking.vra8jenkins.VRAClient
 import java.util.concurrent.TimeoutException
 
 class  VRA8 implements Serializable {
-    private static ThreadLocal logger
+    private static ThreadLocal logger = new ThreadLocal()
 
     private VRAClient client
     VRA8(steps, String url, String token) {
