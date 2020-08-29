@@ -26,6 +26,7 @@ class VRAClient implements Serializable {
         this.token = post(url + "/iaas/api/login", [ refreshToken: token ], [apiVersion: apiVersion]).token
     }
 
+    @NonCPS
     def getBlueprintByName(String name) {
         def bps = get(url + "/blueprint/api/blueprints", [ name: name, apiVersion: apiVersion ])
         checkRespoonseSingleton(bps)
@@ -41,12 +42,14 @@ class VRAClient implements Serializable {
         return cis.content[0]
     }
 
+    @NonCPS
     def getProjectByName(String name) {
         def projs = get(url + "/iaas/api/projects", [ apiVersion: apiVersion, '$filter': "name eq '$name'"])
         checkRespoonseSingleton(projs)
         return projs.content[0]
     }
 
+    @NonCPS
     def provisionFromCatalog(String ciName, String version, String project, String deploymentName, String reason, Map inputs = [:], int count = 1) {
         def ci = getCatalogItemByName(ciName)
         def ciId = ci.id
@@ -69,10 +72,12 @@ class VRAClient implements Serializable {
         return dep
     }
 
+    @NonCPS
     def getDeployment(String deploymentId, boolean expandResources = false) {
         return get(url + "/deployment/api/deployments/$deploymentId", [ expandResources: expandResources.toString(), apiVersion: apiVersion])
     }
 
+    @NonCPS
     def waitForDeployment(String deploymentId, long timeout = 60000) {
         def start = System.currentTimeMillis()
         for(;;) {
@@ -91,10 +96,12 @@ class VRAClient implements Serializable {
         }
     }
 
+    @NonCPS
     def deleteDeploymentNoWait(String deploymentId) {
         return delete(url + "/deployment/api/deployments/$deploymentId", [ apiVersion: apiVersion ])
     }
 
+    @NonCPS
     def deleteDeployment(String deploymentId, long timeout = 60000) {
         def dep = deleteDeploymentNoWait(deploymentId)
         assert dep != null
