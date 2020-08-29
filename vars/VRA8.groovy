@@ -43,14 +43,20 @@ class  VRA8 implements Serializable {
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
     def deployFromCatalogNoWait(String catalogItem, String version, String projectName, String deploymentName = null, String reason = null) {
-        log("Entering deployFromCatalogNoWait")
-        if (deploymentName == null) {
-            deploymentName = "Invoked from Jenkins " + UUID.randomUUID().toString()
+        try {
+            log("Entering deployFromCatalogNoWait")
+            System.err.println("This is stderr!")
+            if (deploymentName == null) {
+                deploymentName = "Invoked from Jenkins " + UUID.randomUUID().toString()
+            }
+            def dep = client.provisionFromCatalog(catalogItem, version, projectName, deploymentName, reason)
+            assert dep != null
+            log("Exiting deployFromCatalogNoWait")
+            return dep
+        } catch(Exception e) {
+            log(e.toString())
+            throw e
         }
-        def dep = client.provisionFromCatalog(catalogItem, version, projectName, deploymentName, reason)
-        assert dep != null
-        log("Exiting deployFromCatalogNoWait")
-        return dep
     }
 
     /**
