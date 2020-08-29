@@ -20,6 +20,7 @@ class  VRA8 implements Serializable {
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
     def deployFromCatalog(String catalogItem, String version, String projectName, String deploymentName = null, String reason = null, long timeout = 300) {
+        System.err.println("Entering deployFromCatalog")
         def dep = deployFromCatalogNoWait(catalogItem, version, projectName, deploymentName, reason)
         return client.waitForDeployment(dep.deploymentId, timeout * 1000)
     }
@@ -35,11 +36,13 @@ class  VRA8 implements Serializable {
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
     def deployFromCatalogNoWait(String catalogItem, String version, String projectName, String deploymentName = null, String reason = null) {
+        System.err.println("Entering deployFromCatalogNoWait")
         if (deploymentName == null) {
             deploymentName = "Invoked from Jenkins " + UUID.randomUUID().toString()
         }
         def dep = client.provisionFromCatalog(catalogItem, version, projectName, deploymentName, reason)
         assert dep != null
+        System.err.println("Exiting deployFromCatalogNoWait")
         return dep
     }
 
@@ -50,7 +53,11 @@ class  VRA8 implements Serializable {
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
     def waitForDeployment(String deploymentId, long timeout = 300) {
-        return client.waitForDeployment(deploymentId, timeout * 1000)
+        System.err.println("Entering waitForDeployment")
+        def dep = client.waitForDeployment(deploymentId, timeout * 1000)
+        assert dep != null
+        System.err.println("Exiting waitForDeployment")
+        return dep
     }
 
     /**
@@ -63,6 +70,7 @@ class  VRA8 implements Serializable {
      * @return The IP address as a String
      */
     def waitForIPAddress(String deploymentId, String resourceName, long timeout = 300) {
+        System.err.println("Entering waitForIPAddress")
         timeout *= 1000
         def start = System.currentTimeMillis()
         def dep = client.waitForDeployment(deploymentId, timeout)
@@ -73,6 +81,7 @@ class  VRA8 implements Serializable {
                 }
                 def ip = resource?.properties?.address
                 if(ip != null) {
+                    System.err.println("Exiting waitForIPAddress")
                     return ip
                 }
                 break
@@ -93,7 +102,11 @@ class  VRA8 implements Serializable {
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
     def deleteDeploymentNoWait(String deploymentId) {
-        client.deleteDeploymentNoWait(deploymentId)
+        System.err.println("Entering deleteDeploymentNoWait")
+        def dep = client.deleteDeploymentNoWait(deploymentId)
+        assert dep != null
+        System.err.println("Exiting deleteDeploymentNoWait")
+        return dep
     }
 
     /**
@@ -103,6 +116,10 @@ class  VRA8 implements Serializable {
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
     def deleteDeployment(String deploymentId, long timeout = 300) {
-        client.deleteDeployment(deploymentId, timeout * 1000)
+        System.err.println("Entering deleteDeployment")
+        def dep = client.deleteDeployment(deploymentId, timeout * 1000)
+        assert dep != null
+        System.err.println("Exiting deleteDeployment")
+        return dep
     }
 }
