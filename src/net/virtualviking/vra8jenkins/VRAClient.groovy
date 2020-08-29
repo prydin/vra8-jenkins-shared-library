@@ -50,11 +50,11 @@ class VRAClient implements Serializable {
     def provisionFromCatalog(String ciName, String version, String project, String deploymentName, String reason, Map inputs = [:], int count = 1) {
         def ci = getCatalogItemByName(ciName)
         def ciId = ci.id
-        println "Mapped catalog item $ciName to $ci.id"
+        System.err.println("Mapped catalog item $ciName to $ci.id")
 
         def proj = getProjectByName(project)
         def projectId = proj.id
-        println "Mapped project name $project to $proj.id"
+        System.err.println("Mapped project name $project to $proj.id")
 
         def payload = [
                 bulkRequestCount: count,
@@ -64,7 +64,9 @@ class VRAClient implements Serializable {
                 inputs: inputs,
                 version: version
         ]
-        return post(url + "/catalog/api/items/$ciId/request", payload, [ apiVersion: apiVersion ])
+        def dep = post(url + "/catalog/api/items/$ciId/request", payload, [ apiVersion: apiVersion ])
+        System.err.println("Deployment request returned: " + JsonOutput.toJson(dep))
+        return dep
     }
 
     def getDeployment(String deploymentId, boolean expandResources = false) {
@@ -81,7 +83,7 @@ class VRAClient implements Serializable {
                 }
             }
             def remaining = timeout - (System.currentTimeMillis() - start)
-            println "Waiting for deployment $remaining ms to timeout"
+            System.err.println("Waiting for deployment $remaining ms to timeout")
             if(remaining <= 0) {
                 throw new TimeoutException("Timeout while waiting for deployment to finish");
             }
