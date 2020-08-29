@@ -12,6 +12,7 @@ class  VRA8 implements Serializable {
         logger.set(steps)
     }
 
+    @NonCPS
     static def log(String s) {
         logger.get().println(s)
     }
