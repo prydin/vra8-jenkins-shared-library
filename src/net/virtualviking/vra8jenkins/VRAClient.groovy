@@ -32,6 +32,7 @@ class VRAClient implements Serializable {
         return bps.content[0]
     }
 
+    @NonCPS
     def getCatalogItemByName(String name) {
         def cis = get(url + "/catalog/api/items", [ apiVersion: apiVersion, 'search': name, size: "100000" ])
         checkRespoonseSingleton(cis)
