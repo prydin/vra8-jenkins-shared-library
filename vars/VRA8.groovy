@@ -20,7 +20,7 @@ class  VRA8 implements Serializable {
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
     def deployFromCatalog(String catalogItem, String version, String projectName, String deploymentName = null, String reason = null, long timeout = 300) {
-       def dep = deployFromCatalogNoWait(catalogItem, version, projectName, deploymentName, reason)
+        def dep = deployFromCatalogNoWait(catalogItem, version, projectName, deploymentName, reason)
         return client.waitForDeployment(dep.deploymentId, timeout * 1000)
     }
 

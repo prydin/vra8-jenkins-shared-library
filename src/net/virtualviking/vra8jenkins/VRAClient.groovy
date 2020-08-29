@@ -73,10 +73,13 @@ class VRAClient implements Serializable {
         def start = System.currentTimeMillis()
         for(;;) {
             def dep = getDeployment(deploymentId)
-            if(!dep.status.endsWith("_INPROGRESS")) {
-                return getDeployment(deploymentId, true)
+            if(dep != null || dep.status != null) {
+                if (!dep.status.endsWith("_INPROGRESS")) {
+                    return getDeployment(deploymentId, true)
+                }
             }
             def remaining = timeout - (System.currentTimeMillis() - start)
+            println "Waiting for deployment $remaining ms to timeout"
             if(remaining <= 0) {
                 throw new TimeoutException("Timeout while waiting for deployment to finish");
             }
