@@ -12,6 +12,6 @@ class  VRA8 implements Serializable {
         }
         def dep = client.provisionFromCatalog(catalogItem, version, projectName, deploymentName, reason)
         assert dep != null
-        client.waitForDeployment(dep, timeout * 1000)
+        client.waitForDeployment(dep.deploymentId, timeout * 1000)
     }
 }
