@@ -6,11 +6,11 @@ class  VRA8 implements Serializable {
         client = new VRAClient(url, token)
     }
 
-    def deployFromCatalog(String catalogItem, String version, String projectName, String deploymentName = null, long timeout = 300) {
+    def deployFromCatalog(String catalogItem, String version, String projectName, String deploymentName = null, String reason null, long timeout = 300) {
         if(deploymentName == null) {
             deploymentName = "Jenkins " + UUID.randomUUID().toString()
         }
-        def dep = client.provisionFromCatalog(catalogItem, version, projectName, deploymentName)
+        def dep = client.provisionFromCatalog(catalogItem, version, projectName, deploymentName, reason)
         assert dep != null
         client.waitForDeployment(dep, timeout * 1000)
     }
