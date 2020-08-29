@@ -50,9 +50,11 @@ class VRAClient implements Serializable {
     def provisionFromCatalog(String ciName, String version, String project, String deploymentName, String reason, Map inputs = [:], int count = 1) {
         def ci = getCatalogItemByName(ciName)
         def ciId = ci.id
+        println "Mapped catalog item $ciName to $ci.id"
 
         def proj = getProjectByName(project)
         def projectId = proj.id
+        println "Mapped project name $project to $proj.id"
 
         def payload = [
                 bulkRequestCount: count,
