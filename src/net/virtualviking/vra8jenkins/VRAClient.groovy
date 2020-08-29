@@ -78,7 +78,7 @@ class VRAClient implements Serializable {
             }
             def remaining = timeout - (System.currentTimeMillis() - start)
             if(remaining <= 0) {
-                throw new TimeoutException();
+                throw new TimeoutException("Timeout while waiting for deployment to finish");
             }
             Thread.sleep(Math.min(remaining, deploymentPollInterval))
         }
