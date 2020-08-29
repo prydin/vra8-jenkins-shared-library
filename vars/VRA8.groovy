@@ -1,3 +1,4 @@
+import com.cloudbees.groovy.cps.NonCPS
 import net.virtualviking.vra8jenkins.VRAClient
 
 import java.util.concurrent.TimeoutException
@@ -26,6 +27,7 @@ class  VRA8 implements Serializable {
      * @param timeout Timeout waiting for the deployment to finish, in seconds
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
+    @NonCPS
     def deployFromCatalog(String catalogItem, String version, String projectName, String deploymentName = null, String reason = null, long timeout = 300) {
         log("Entering deployFromCatalog")
         def dep = deployFromCatalogNoWait(catalogItem, version, projectName, deploymentName, reason)
@@ -42,6 +44,7 @@ class  VRA8 implements Serializable {
      * @param reason A description of the deployment. May be left blank
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
+    @NonCPS
     def deployFromCatalogNoWait(String catalogItem, String version, String projectName, String deploymentName = null, String reason = null) {
         try {
             log("Entering deployFromCatalogNoWait")
@@ -65,6 +68,7 @@ class  VRA8 implements Serializable {
      * @param timeout Timeout waiting for the deployment to finish, in seconds
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
+    @NonCPS
     def waitForDeployment(String deploymentId, long timeout = 300) {
         log("Entering waitForDeployment")
         def dep = client.waitForDeployment(deploymentId, timeout * 1000)
@@ -82,6 +86,7 @@ class  VRA8 implements Serializable {
      * @param timeout A timeout in seconds
      * @return The IP address as a String
      */
+    @NonCPS
     def waitForIPAddress(String deploymentId, String resourceName, long timeout = 300) {
         log("Entering waitForIPAddress")
         timeout *= 1000
@@ -114,6 +119,7 @@ class  VRA8 implements Serializable {
      * @param deploymentId The deployment id to delete
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
+    @NonCPS
     def deleteDeploymentNoWait(String deploymentId) {
         log("Entering deleteDeploymentNoWait")
         def dep = client.deleteDeploymentNoWait(deploymentId)
@@ -128,6 +134,7 @@ class  VRA8 implements Serializable {
      * @param timeout A timeout in seconds
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
+    @NonCPS
     def deleteDeployment(String deploymentId, long timeout = 300) {
         log("Entering deleteDeployment")
         def dep = client.deleteDeployment(deploymentId, timeout * 1000)
