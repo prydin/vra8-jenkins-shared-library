@@ -3,9 +3,16 @@ import net.virtualviking.vra8jenkins.VRAClient
 import java.util.concurrent.TimeoutException
 
 class  VRA8 implements Serializable {
+    private static ThreadLocal logger
+
     private VRAClient client
-    VRA8(String url, String token) {
+    VRA8(steps, String url, String token) {
         client = new VRAClient(url, token)
+        logger.set(steps)
+    }
+
+    static def log(String s) {
+        logger.get().println(s)
     }
 
     /**
@@ -20,7 +27,7 @@ class  VRA8 implements Serializable {
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
     def deployFromCatalog(String catalogItem, String version, String projectName, String deploymentName = null, String reason = null, long timeout = 300) {
-        System.err.println("Entering deployFromCatalog")
+        log("Entering deployFromCatalog")
         def dep = deployFromCatalogNoWait(catalogItem, version, projectName, deploymentName, reason)
         return client.waitForDeployment(dep.deploymentId, timeout * 1000)
     }
@@ -36,13 +43,13 @@ class  VRA8 implements Serializable {
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
     def deployFromCatalogNoWait(String catalogItem, String version, String projectName, String deploymentName = null, String reason = null) {
-        System.err.println("Entering deployFromCatalogNoWait")
+        log("Entering deployFromCatalogNoWait")
         if (deploymentName == null) {
             deploymentName = "Invoked from Jenkins " + UUID.randomUUID().toString()
         }
         def dep = client.provisionFromCatalog(catalogItem, version, projectName, deploymentName, reason)
         assert dep != null
-        System.err.println("Exiting deployFromCatalogNoWait")
+        log("Exiting deployFromCatalogNoWait")
         return dep
     }
 
@@ -53,10 +60,10 @@ class  VRA8 implements Serializable {
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
     def waitForDeployment(String deploymentId, long timeout = 300) {
-        System.err.println("Entering waitForDeployment")
+        log("Entering waitForDeployment")
         def dep = client.waitForDeployment(deploymentId, timeout * 1000)
         assert dep != null
-        System.err.println("Exiting waitForDeployment")
+        log("Exiting waitForDeployment")
         return dep
     }
 
@@ -70,7 +77,7 @@ class  VRA8 implements Serializable {
      * @return The IP address as a String
      */
     def waitForIPAddress(String deploymentId, String resourceName, long timeout = 300) {
-        System.err.println("Entering waitForIPAddress")
+        log("Entering waitForIPAddress")
         timeout *= 1000
         def start = System.currentTimeMillis()
         def dep = client.waitForDeployment(deploymentId, timeout)
@@ -81,7 +88,7 @@ class  VRA8 implements Serializable {
                 }
                 def ip = resource?.properties?.address
                 if(ip != null) {
-                    System.err.println("Exiting waitForIPAddress")
+                    log("Exiting waitForIPAddress")
                     return ip
                 }
                 break
@@ -102,10 +109,10 @@ class  VRA8 implements Serializable {
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
     def deleteDeploymentNoWait(String deploymentId) {
-        System.err.println("Entering deleteDeploymentNoWait")
+        log("Entering deleteDeploymentNoWait")
         def dep = client.deleteDeploymentNoWait(deploymentId)
         assert dep != null
-        System.err.println("Exiting deleteDeploymentNoWait")
+        log("Exiting deleteDeploymentNoWait")
         return dep
     }
 
@@ -116,10 +123,10 @@ class  VRA8 implements Serializable {
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
     def deleteDeployment(String deploymentId, long timeout = 300) {
-        System.err.println("Entering deleteDeployment")
+        log("Entering deleteDeployment")
         def dep = client.deleteDeployment(deploymentId, timeout * 1000)
         assert dep != null
-        System.err.println("Exiting deleteDeployment")
+        log("Exiting deleteDeployment")
         return dep
     }
 }

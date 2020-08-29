@@ -8,7 +8,7 @@ class VRA8Test extends Specification {
         if(cachedInstance != null) {
             return cachedInstance
         }
-        cachedInstance = new VRA8(System.getenv("VRA_URL"), System.getenv("VRA_TOKEN"))
+        cachedInstance = new VRA8(System.err, System.getenv("VRA_URL"), System.getenv("VRA_TOKEN"))
     }
 
     def "test instantiation"() {
