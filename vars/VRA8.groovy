@@ -10,7 +10,7 @@ class  VRA8 implements Serializable {
         if(deploymentName == null) {
             deploymentName = "Jenkins " + UUID.randomUUID().toString()
         }
-        def dep = client.provisionFromCatalog(catalogItem, version, project, deploymentName)
+        def dep = client.provisionFromCatalog(catalogItem, version, projectName, deploymentName)
         assert dep != null
         client.waitForDeployment(dep, timeout * 1000)
     }
