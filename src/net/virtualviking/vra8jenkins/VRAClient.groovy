@@ -1,5 +1,6 @@
 package net.virtualviking.vra8jenkins
 
+import com.cloudbees.groovy.cps.NonCPS
 import groovy.json.JsonSlurper
 
 import java.nio.charset.Charset
@@ -92,6 +93,7 @@ class VRAClient implements Serializable {
         return waitForDeployment(deploymentId)
     }
 
+    @NonCPS
     private post(String url, Map payload, Map query = null) {
         if(query != null) {
            url += buildQueryString(query)
