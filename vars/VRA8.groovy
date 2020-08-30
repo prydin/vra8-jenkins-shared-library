@@ -3,13 +3,11 @@ import net.virtualviking.vra8jenkins.VRAClient
 
 import java.util.concurrent.TimeoutException
 
-@Grab('org.yaml:snakeyaml:1.17')
-import org.yaml.snakeyaml.Yaml
-
-class  VRA8 implements Serializable {
+class VRA8 implements Serializable {
     private static ThreadLocal logger = new ThreadLocal()
 
     private VRAClient client
+
     VRA8(steps, String url, String token) {
         client = new VRAClient(url, token)
         logger.set(steps)
@@ -28,13 +26,21 @@ class  VRA8 implements Serializable {
      * @param projectName The project name under which to deploy the item
      * @param deploymentName The name of the deployment. Auto generated if blank
      * @param reason A description of the deployment. May be left blank
+     * @param inputs A map of blueprint-specific inputs. May be omitted for default input values.
      * @param timeout Timeout waiting for the deployment to finish, in seconds
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
     @NonCPS
-    def deployFromCatalog(String catalogItem, String version, String projectName, String deploymentName = null, String reason = null, long timeout = 300) {
+    def deployFromCatalog(
+            String catalogItem,
+            String version,
+            String projectName,
+            String deploymentName = null,
+            String reason = null,
+            Map inputs = [:],
+            long timeout = 300) {
         log("Entering deployFromCatalog")
-        def dep = deployFromCatalogNoWait(catalogItem, version, projectName, deploymentName, reason)
+        def dep = deployFromCatalogNoWait(catalogItem, version, projectName, deploymentName, reason, inputs)
         return client.waitForDeployment(dep.deploymentId, timeout * 1000)
     }
 
@@ -49,18 +55,23 @@ class  VRA8 implements Serializable {
      * @return A deployment record as described here: https://code.vmware.com/apis/979#/Deployments
      */
     @NonCPS
-    def deployFromCatalogNoWait(String catalogItem, String version, String projectName, String deploymentName = null, String reason = null) {
+    def deployFromCatalogNoWait(
+            String catalogItem,
+            String version,
+            String projectName,
+            String deploymentName = null,
+            String reason = null,
+            Map inputs = [:]) {
         try {
             log("Entering deployFromCatalogNoWait")
-            System.err.println("This is stderr!")
             if (deploymentName == null) {
                 deploymentName = "Invoked from Jenkins " + UUID.randomUUID().toString()
             }
-            def dep = client.provisionFromCatalog(catalogItem, version, projectName, deploymentName, reason)
+            def dep = client.provisionFromCatalog(catalogItem, version, projectName, deploymentName, reason, inputs)
             assert dep != null
             log("Exiting deployFromCatalogNoWait")
             return dep
-        } catch(Exception e) {
+        } catch (Exception e) {
             log(e.toString())
             throw e
         }
@@ -96,19 +107,19 @@ class  VRA8 implements Serializable {
         timeout *= 1000
         def start = System.currentTimeMillis()
         def dep = client.waitForDeployment(deploymentId, timeout)
-        for(;;) {
+        for (; ;) {
             def resource = dep.resources.find { it.name == resourceName }
-            if(resource == null) {
+            if (resource == null) {
                 continue
             }
             def ip = resource?.properties?.address
-            if(ip != null) {
+            if (ip != null) {
                 log("Exiting waitForIPAddress")
                 return ip
             }
 
             def remaining = timeout - (System.currentTimeMillis() - start)
-            if(remaining <= 0) {
+            if (remaining <= 0) {
                 throw new TimeoutException("Timeout while waiting for IP address")
             }
             Thread.sleep(Math.min(remaining, 30000))
@@ -146,6 +157,12 @@ class  VRA8 implements Serializable {
     }
 
     @NonCPS
-    def deployCatalogItemFromYaml(String filename, long timeout = 300) {
+    def deployCatalogItemFromConfig(Map config, long timeout = 300) {
+        return deployFromCatalog(config.catalogItem, config.version, config.project, config.deploymentName, config.reason, config.inputs, timeout)
+    }
+
+    @NonCPS
+    def deployCatalogItemFromConfigNoWait(Map config, long timeout = 300) {
+        return deployFromCatalogNoWait(config.catalogItem, config.version, config.project, config.deploymentName, config.reason, config.inputs, timeout)
     }
 }
