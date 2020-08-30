@@ -3,6 +3,9 @@ import net.virtualviking.vra8jenkins.VRAClient
 
 import java.util.concurrent.TimeoutException
 
+@Grab('org.yaml:snakeyaml:1.17')
+import org.yaml.snakeyaml.Yaml
+
 class  VRA8 implements Serializable {
     private static ThreadLocal logger = new ThreadLocal()
 
@@ -144,6 +147,5 @@ class  VRA8 implements Serializable {
 
     @NonCPS
     def deployCatalogItemFromYaml(String filename, long timeout = 300) {
-
     }
 }
