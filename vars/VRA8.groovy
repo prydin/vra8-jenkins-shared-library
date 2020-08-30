@@ -94,16 +94,14 @@ class  VRA8 implements Serializable {
         def start = System.currentTimeMillis()
         def dep = client.waitForDeployment(deploymentId, timeout)
         for(;;) {
-            for(def resource : dep.resources) {
-                if(resource.name != resourceName) {
-                    continue
-                }
-                def ip = resource?.properties?.address
-                if(ip != null) {
-                    log("Exiting waitForIPAddress")
-                    return ip
-                }
-                break
+            def resource = dep.resources.find { it.name == resourceName }
+            if(resource == null) {
+                continue
+            }
+            def ip = resource?.properties?.address
+            if(ip != null) {
+                log("Exiting waitForIPAddress")
+                return ip
             }
 
             def remaining = timeout - (System.currentTimeMillis() - start)
@@ -142,5 +140,10 @@ class  VRA8 implements Serializable {
         assert dep != null
         log("Exiting deleteDeployment")
         return dep
+    }
+
+    @NonCPS
+    def deployCatalogItemFromYaml(String filename, long timeout = 300) {
+
     }
 }
