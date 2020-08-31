@@ -8,13 +8,24 @@ class VRA8 implements Serializable {
 
     private VRAClient client
 
+    /**
+     * Constructs a new VRA8 object to be used throughout a pipeline
+     * @param steps Reference to the steps object. Should always be set to <tt>this</tt> when
+     * used from a pipeline.
+     * @param url The vRealize Automation URL
+     * @param token The vRealize Automation API token
+     */
     VRA8(steps, String url, String token) {
         client = new VRAClient(url, token)
         logger.set(steps)
     }
 
+    /**
+     * Used internally for logging
+     * @param The string to log
+     */
     @NonCPS
-    static def log(String s) {
+    protected static def log(String s) {
         logger.get().println(s)
     }
 
