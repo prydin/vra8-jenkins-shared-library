@@ -1,5 +1,5 @@
 # vra8-jenkins-shared-library
-A shared library for interacting with vRealize Automation 8.x
+A Jenkins shared library for interacting with vRealize Automation 8.x
 
 This library contains functions for creating, deleting and examining deployments of vRealize Automation catalog items.
 
